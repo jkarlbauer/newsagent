@@ -1,6 +1,6 @@
 # NewsAgent
 
-An AI Agent that scrapes recent news, identifies the most relevant articles using semantic embeddings, and delivers per-article summaries — automatically every morning at 6AM (Berlin time) or on demand via `/launch`.
+An AI Agent that scrapes recent news, identifies the most relevant articles using semantic embeddings, and delivers per-article summaries via Telegram — automatically every morning at 6AM (Berlin time) or on demand via `/launch`.
 
 ## How it works
 
