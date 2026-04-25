@@ -1,0 +1,19 @@
+{
+  "max_articles_per_topic": 30,
+  "decode_interval": 2,
+  "scrape_window": "24h",
+  "topics": [
+    "ai", 
+    "artificial intelligence", 
+    "anthropic",
+    "openai",
+    "gemini",
+    "deepseek"
+  ],
+  "region": "hl=en-US&gl=US&ceid=US:en",
+  "n_closest": 5,
+  "deepseek_model": "deepseek-chat",
+  "embedding_model": "all-mpnet-base-v2",
+  "embedding_batch_size": 8,
+  "embedding_overlap": 0.15
+}
