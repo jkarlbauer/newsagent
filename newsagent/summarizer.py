@@ -36,6 +36,10 @@ class Summarizer:
                 time.sleep(wait)
 
     def summarize_all(self, articles):
+        result = []
         for article in articles:
-            self.summarize(article)
-        return articles
+            try:
+                result.append(self.summarize(article))
+            except Exception as e:
+                print(f"  skipping '{article.title}': {e}")
+        return result

@@ -57,8 +57,3 @@ class Scraper:
         return articles
 
 
-if __name__ == "__main__":
-    scraper = NewsScraper()
-    data = scraper.scrape_all()
-    for topic, articles in data.items():
-        print(f"\n{topic}: {len(articles)} articles scraped")

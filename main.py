@@ -8,7 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 import pytz
 from newsagent.scraper import Scraper
 from newsagent.summarizer import Summarizer
-from newsagent.utils import closest_to_center
+from newsagent.scoring import score_articles, select_top
 
 load_dotenv()
 
@@ -23,6 +23,8 @@ summarizer = Summarizer(config)
 
 bot = telebot.TeleBot(os.environ["BOT_TOKEN"])
 
+EMBED_TIMEOUT = 600  # seconds
+
 
 def _embed_worker(articles, config, queue):
     from newsagent.embedder import Embedder
@@ -34,16 +36,24 @@ def embed_in_subprocess(articles, config):
     queue = multiprocessing.Queue()
     p = multiprocessing.Process(target=_embed_worker, args=(articles, config, queue))
     p.start()
-    result = queue.get()
+    try:
+        result = queue.get(timeout=EMBED_TIMEOUT)
+    except Exception:
+        p.terminate()
+        raise RuntimeError("Embedding subprocess timed out or crashed.")
     p.join()
     return result
 
 
 def get_news():
     articles = scraper.scrape_all()
+    if not articles:
+        print("No articles scraped.")
+        return []
     articles = embed_in_subprocess(articles, config)
-    closest = closest_to_center(articles, n=config["n_closest"])
-    return summarizer.summarize_all(closest)
+    articles = score_articles(articles)
+    top = select_top(articles, n=config["n_closest"])
+    return summarizer.summarize_all(top)
 
 
 def format_article(article):
@@ -52,6 +62,9 @@ def format_article(article):
 
 def send_news(chat_id):
     articles = get_news()
+    if not articles:
+        bot.send_message(chat_id, "No articles found.")
+        return
     for article in articles:
         bot.send_message(chat_id, format_article(article), parse_mode="Markdown")
 
