@@ -2,4 +2,4 @@
 env/
 __pycache__/
 *.pyc
-output.json
+log.json

@@ -1,12 +1,12 @@
 {
-  "max_articles_per_topic": 30,
+  "max_articles_per_topic": 10,
   "scrape_window": "24h",
   "topics": [
     "ai",
     "artificial intelligence",
     "anthropic",
     "openai",
-    "gemini",
+    "google gemini",
     "deepseek"
   ],
   "region": "hl=en-US&gl=US&ceid=US:en",

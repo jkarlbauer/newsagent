@@ -15,7 +15,11 @@ load_dotenv()
 with open("config.json") as f:
     config = json.load(f)
 with open("system.json") as f:
-    config.update(json.load(f))
+    system = json.load(f)
+    config.update(system)
+    if system.get("debug"):
+        config.update(system.get("debug_config", {}))
+        print("DEBUG MODE: overrides applied")
 
 config["deepseek_api_key"] = os.environ["DEEPSEEK_API_KEY"]
 config["chat_id"] = os.environ["CHAT_ID"]
@@ -25,7 +29,7 @@ summarizer = Summarizer(config)
 
 bot = telebot.TeleBot(os.environ["BOT_TOKEN"])
 
-EMBED_TIMEOUT = 600  # seconds
+EMBED_TIMEOUT = config["embed_timeout"]
 
 
 def _embed_worker(articles, config, queue):
@@ -58,8 +62,15 @@ def get_news():
     return summarizer.summarize_all(top)
 
 
+def _escape_html(text):
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def format_article(article):
-    return f"*{article.title}*\n{article.summary}\n{article.url}"
+    title = _escape_html(article.title)
+    summary = _escape_html(article.summary)
+    coverage = round(article.coverage * 100)
+    return f"<b>{title}</b>\nCoverage: {coverage}%\n{summary}\n{article.url}"
 
 
 def send_news(chat_id):
@@ -68,7 +79,7 @@ def send_news(chat_id):
         bot.send_message(chat_id, "No articles found.")
         return
     for article in articles:
-        bot.send_message(chat_id, format_article(article), parse_mode="Markdown")
+        bot.send_message(chat_id, format_article(article), parse_mode="HTML")
 
 
 @bot.message_handler(commands=["launch"])
