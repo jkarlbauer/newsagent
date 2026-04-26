@@ -1,5 +1,5 @@
 {
-  "max_articles_per_topic": 10,
+  "max_articles_per_topic": 30,
   "scrape_window": "24h",
   "topics": [
     "ai",
