@@ -38,4 +38,11 @@ def score_articles(articles):
 
 
 def select_top(articles, n):
-    return sorted(articles, key=lambda a: a.score, reverse=True)[:n]
+    ranked = sorted(articles, key=lambda a: a.score, reverse=True)
+    selected = []
+    for candidate in ranked:
+        if all(_cosine_similarity(candidate.embedding, s.embedding) < DUPLICATE_THRESHOLD for s in selected):
+            selected.append(candidate)
+        if len(selected) == n:
+            break
+    return selected
