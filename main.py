@@ -14,6 +14,8 @@ load_dotenv()
 
 with open("config.json") as f:
     config = json.load(f)
+with open("system.json") as f:
+    config.update(json.load(f))
 
 config["deepseek_api_key"] = os.environ["DEEPSEEK_API_KEY"]
 config["chat_id"] = os.environ["CHAT_ID"]
@@ -52,7 +54,7 @@ def get_news():
         return []
     articles = embed_in_subprocess(articles, config)
     articles = score_articles(articles)
-    top = select_top(articles, n=config["n_closest"])
+    top = select_top(articles, n=config["n_articles"])
     return summarizer.summarize_all(top)
 
 
@@ -78,7 +80,11 @@ def handle_launch(message):
 scheduler = BackgroundScheduler()
 scheduler.add_job(
     lambda: send_news(config["chat_id"]),
-    CronTrigger(hour=6, minute=0, timezone=pytz.timezone("Europe/Berlin")),
+    CronTrigger(
+        hour=config["delivery_hour"],
+        minute=config["delivery_minute"],
+        timezone=pytz.timezone(config["delivery_timezone"]),
+    ),
 )
 scheduler.start()
 

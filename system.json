@@ -1,0 +1,6 @@
+{
+  "decode_interval": 2,
+  "embedding_model": "all-mpnet-base-v2",
+  "embedding_batch_size": 8,
+  "embedding_overlap": 0.15
+}
