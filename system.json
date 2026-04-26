@@ -3,12 +3,5 @@
   "embedding_model": "all-mpnet-base-v2",
   "embedding_batch_size": 8,
   "embedding_overlap": 0.15,
-  "embed_timeout": 600,
-  "debug": false,
-  "debug_config": {
-    "topics": ["ai", "artificial intelligence"],
-    "max_articles_per_topic": 5,
-    "n_articles": 2,
-    "decode_interval": 0
-  }
+  "embed_timeout": 600
 }

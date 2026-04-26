@@ -15,11 +15,7 @@ load_dotenv()
 with open("config.json") as f:
     config = json.load(f)
 with open("system.json") as f:
-    system = json.load(f)
-    config.update(system)
-    if system.get("debug"):
-        config.update(system.get("debug_config", {}))
-        print("DEBUG MODE: overrides applied")
+    config.update(json.load(f))
 
 config["deepseek_api_key"] = os.environ["DEEPSEEK_API_KEY"]
 config["chat_id"] = os.environ["CHAT_ID"]
