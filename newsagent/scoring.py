@@ -44,7 +44,7 @@ def select_top(articles, n):
     ranked = sorted(articles, key=lambda a: a.score, reverse=True)
     with open("log.json", "w") as f:
         json.dump([
-            {"rank": i + 1, "title": a.title, "score": round(a.score, 4), "coverage": f"{round(a.coverage * 100)}%", "topic": a.topic, "url": a.url}
+            {"rank": i + 1, "title": a.title, "score": round(a.score, 4), "coverage": f"{round(a.coverage * 100)}%", "topic": a.topic, "url": a.url, "embedding": a.embedding.tolist()}
             for i, a in enumerate(ranked)
         ], f, indent=2)
     print(f"Logged {len(ranked)} ranked articles to log.json")
