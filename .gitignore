@@ -3,4 +3,4 @@ env/
 __pycache__/
 *.pyc
 log.json
-log_archive/
+logs_archive/
