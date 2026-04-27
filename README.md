@@ -1,10 +1,10 @@
 # NewsAgent
 
-An AI agent that scrapes recent news, identifies the most relevant and diverse articles using semantic embeddings, and delivers per-article summaries via Telegram — automatically at a configured time or on demand via `/launch`.
+An AI agent that fetches recent news, identifies the most relevant and diverse articles using semantic embeddings, and delivers per-article summaries via Telegram — automatically at a configured time or on demand via `/launch`.
 
 ## How it works
 
-1. **Scrape** — fetches articles from Google News RSS for configured topics
+1. **Fetch** — fetches articles from Google News RSS for configured topics
 2. **Embed** — encodes each article using a sentence transformer in an isolated subprocess (RAM-safe)
 3. **Score** — ranks articles by `(1 - distance_to_centroid) × duplicate_count`: articles that are central to the overall news and widely covered score highest
 4. **Deduplicate** — greedily selects the top N articles, skipping any that are too similar (cosine similarity ≥ 0.85) to an already-selected one, so each distinct story appears only once
