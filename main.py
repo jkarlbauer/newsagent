@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import multiprocessing
@@ -12,6 +13,10 @@ from newsagent.scoring import score_articles, select_top
 
 load_dotenv()
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--local", action="store_true", help="Run the pipeline once and print results without starting the bot or scheduler")
+args = parser.parse_args()
+
 with open("config.json") as f:
     config = json.load(f)
 with open("system.json") as f:
@@ -22,8 +27,6 @@ config["chat_id"] = os.environ["CHAT_ID"]
 
 scraper = Scraper(config)
 summarizer = Summarizer(config)
-
-bot = telebot.TeleBot(os.environ["BOT_TOKEN"])
 
 EMBED_TIMEOUT = config["embed_timeout"]
 
@@ -69,30 +72,36 @@ def format_article(article):
     return f"<b>{title}</b>\nCoverage: {coverage}%\n{summary}\n{article.url}"
 
 
-def send_news(chat_id):
-    articles = get_news()
-    if not articles:
-        bot.send_message(chat_id, "No articles found.")
-        return
-    for article in articles:
-        bot.send_message(chat_id, format_article(article), parse_mode="HTML")
+if args.local:
+    print("Running in local mode")
+    for article in get_news():
+        print(format_article(article))
+        print()
+else:
+    bot = telebot.TeleBot(os.environ["BOT_TOKEN"])
 
+    def send_news(chat_id):
+        articles = get_news()
+        if not articles:
+            bot.send_message(chat_id, "No articles found.")
+            return
+        for article in articles:
+            bot.send_message(chat_id, format_article(article), parse_mode="HTML")
 
-@bot.message_handler(commands=["launch"])
-def handle_launch(message):
-    bot.reply_to(message, "Scraping and summarising news, please wait...")
-    send_news(message.chat.id)
+    @bot.message_handler(commands=["launch"])
+    def handle_launch(message):
+        bot.reply_to(message, "Scraping and summarising news, please wait...")
+        send_news(message.chat.id)
 
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(
+        lambda: send_news(config["chat_id"]),
+        CronTrigger(
+            hour=config["delivery_hour"],
+            minute=config["delivery_minute"],
+            timezone=pytz.timezone(config["delivery_timezone"]),
+        ),
+    )
+    scheduler.start()
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(
-    lambda: send_news(config["chat_id"]),
-    CronTrigger(
-        hour=config["delivery_hour"],
-        minute=config["delivery_minute"],
-        timezone=pytz.timezone(config["delivery_timezone"]),
-    ),
-)
-scheduler.start()
-
-bot.infinity_polling()
+    bot.infinity_polling()
