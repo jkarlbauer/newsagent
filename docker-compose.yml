@@ -1,0 +1,25 @@
+version: '3'
+services:
+  app:
+    build: .
+    container_name: newsagent
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./users.db:/app/users.db
+      - ./logs:/app/logs
+      - ./config.json:/app/config.json:ro
+
+  dashboard:
+    build: .
+    container_name: newsagent-dashboard
+    restart: always
+    command: python dashboard.py
+    ports:
+      - "5050:5050"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./logs:/app/logs
+      - ./config.json:/app/config.json:ro

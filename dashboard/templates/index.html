@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Newlytics Dashboard</title>
+    <style>
+        body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1 { font-size: 1.4em; margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; border-bottom: 2px solid #333; padding: 6px 12px; }
+        td { padding: 6px 12px; border-bottom: 1px solid #ddd; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .empty { color: #888; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <h1>Newlytics — Run History</h1>
+    {% if runs %}
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Run</th>
+            <th></th>
+        </tr>
+        {% for run in runs %}
+        <tr>
+            <td>{{ run.chat_id }}</td>
+            <td>{{ run.label }}</td>
+            <td><a href="/plot/{{ run.chat_id }}/{{ run.filename }}">view plot →</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No runs logged yet.</p>
+    {% endif %}
+</body>
+</html>
